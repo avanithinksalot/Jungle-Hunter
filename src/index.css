@@ -1,0 +1,435 @@
+@import url('https://fonts.googleapis.com/css2?family=Pixelify+Sans:wght@400;500;600;700&family=DM+Sans:wght@400;500&display=swap');
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --card:         rgba(228,236,210,0.88);
+  --card-done:    rgba(215,222,198,0.82);
+  --card-overdue: rgba(240,220,212,0.88);
+  --card-soon:    rgba(240,232,200,0.88);
+  --green:        #7AAD5C;
+  --dark-green:   #3D6628;
+  --glow:         #E8A88C;
+  --pink:         #E8C0C8;
+  --gold:         #E0C870;
+  --text:         #2E3A22;
+  --text-muted:   #7A8A68;
+  --red:          #D07060;
+  --border:       rgba(100,150,70,0.25);
+}
+
+body {
+  min-height: 100vh;
+  padding: 2.5rem 1rem 5rem;
+  color: var(--text);
+  font-family: 'DM Sans', sans-serif;
+  background-image: url('/forest-bg.webp');
+  background-size: cover;
+  background-position: center top;
+  background-repeat: no-repeat;
+  background-attachment: fixed;
+}
+
+#root {
+  max-width: 560px;
+  margin: 0 auto;
+}
+
+/* ── pixel border mixin via box-shadow ── */
+.pixel-border {
+  border: 2px solid var(--green);
+  box-shadow:
+    0 0 0 1px var(--bg-low),
+    0 0 0 3px rgba(90,140,60,0.12);
+  image-rendering: pixelated;
+}
+
+/* ── header ── */
+
+.header {
+  text-align: center;
+  margin-bottom: 2.5rem;
+}
+
+.header-leaf {
+  font-size: 1.6rem;
+  display: block;
+  margin-bottom: 0.5rem;
+  filter: drop-shadow(0 0 6px rgba(212,137,106,0.6));
+}
+
+.header h1 {
+  font-family: 'Pixelify Sans', monospace;
+  font-size: 2rem;
+  color: var(--text);
+  letter-spacing: 0.04em;
+  margin-bottom: 0.3rem;
+  text-shadow: 0 0 20px rgba(212,137,106,0.4), 2px 2px 0 rgba(0,0,0,0.5);
+}
+
+.header p {
+  font-family: 'Pixelify Sans', monospace;
+  font-size: 0.72rem;
+  color: var(--text-muted);
+  letter-spacing: 0.08em;
+}
+
+/* ── add form ── */
+
+.add-form {
+  background: transparent;
+  border: none;
+  border-radius: 0;
+  padding: 1.25rem 1.4rem;
+  margin-bottom: 1.75rem;
+  position: relative;
+}
+
+.add-form::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: rgba(210,235,180,0.45);
+  border: 2px solid rgba(45,90,25,0.6);
+  filter: url(#wavy-card) drop-shadow(0 0 5px rgba(25,70,10,0.7));
+  z-index: -1;
+  pointer-events: none;
+}
+
+.form-label {
+  display: block;
+  font-family: 'Pixelify Sans', monospace;
+  font-size: 0.68rem;
+  color: var(--green);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  margin-bottom: 0.4rem;
+}
+
+.form-input {
+  width: 100%;
+  background: rgba(240,248,225,0.55);
+  border: 2px solid rgba(60,110,35,0.4);
+  border-radius: 0;
+  padding: 0.6rem 0.85rem;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 0.92rem;
+  color: var(--text);
+  outline: none;
+  transition: border-color 0.15s, box-shadow 0.15s;
+  margin-bottom: 0.85rem;
+}
+
+.form-input::placeholder { color: rgba(100,120,80,0.45); }
+
+.form-input:focus {
+  border-color: var(--green);
+  box-shadow: 0 0 0 2px rgba(100,150,70,0.15);
+}
+
+input[type="date"].form-input { color-scheme: light; }
+input[type="date"].form-input::-webkit-calendar-picker-indicator { opacity: 0.5; cursor: pointer; }
+
+.form-row {
+  display: flex;
+  gap: 0.7rem;
+  align-items: flex-end;
+}
+
+.date-wrap { flex: 1.4; }
+.date-wrap .form-input { margin-bottom: 0; }
+
+.time-wrap { flex: 1; }
+.time-wrap .form-input { margin-bottom: 0; }
+input[type="time"].form-input { color-scheme: dark; }
+
+.btn-add {
+  background: var(--green);
+  color: #fff;
+  border: 2px solid rgba(100,150,70,0.5);
+  box-shadow: 0 0 0 1px rgba(160,200,130,0.3), 3px 3px 0 rgba(80,110,60,0.3);
+  border-radius: 0;
+  padding: 0 1.3rem;
+  height: 40px;
+  font-family: 'Pixelify Sans', monospace;
+  font-size: 0.8rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  cursor: pointer;
+  transition: background 0.15s, transform 0.08s, box-shadow 0.08s;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.btn-add:hover  { background: #6BAD48; }
+.btn-add:active {
+  transform: translate(2px, 2px);
+  box-shadow: 0 0 0 1px rgba(0,0,0,0.3), 1px 1px 0 rgba(0,0,0,0.35);
+}
+
+.notif-btn {
+  display: block;
+  width: 100%;
+  margin-top: 0.7rem;
+  background: transparent;
+  border: 1px dashed rgba(212,168,75,0.3);
+  border-radius: 0;
+  padding: 0.45rem 1rem;
+  font-family: 'Pixelify Sans', monospace;
+  font-size: 0.68rem;
+  letter-spacing: 0.05em;
+  color: rgba(212,168,75,0.65);
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s;
+}
+
+.notif-btn:hover { background: rgba(212,168,75,0.06); color: var(--gold); }
+
+.notif-btn.granted {
+  color: var(--green);
+  border-color: rgba(90,140,60,0.3);
+  cursor: default;
+}
+
+/* ── section labels ── */
+
+.section-label {
+  font-family: 'Pixelify Sans', monospace;
+  font-size: 0.65rem;
+  color: var(--text-muted);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  margin: 1.5rem 0 0.55rem 1px;
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+}
+
+.section-label::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: linear-gradient(to right, rgba(100,150,70,0.3), transparent);
+}
+
+.task-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+
+/* ── task card ── */
+
+.task-card {
+  background: transparent;
+  border: none;
+  box-shadow: none;
+  border-radius: 0;
+  padding: 0.85rem 1rem;
+  position: relative;
+  overflow: visible;
+  transform-origin: top center;
+}
+
+/* wavy background layer — only this gets the filter */
+.task-card::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: rgba(210,235,180,0.38);
+  border: 2px solid rgba(45,90,25,0.55);
+  filter: url(#wavy-card) drop-shadow(0 0 3px rgba(25,70,10,0.65));
+  z-index: -1;
+  pointer-events: none;
+}
+
+/* left accent bar */
+.task-card::before {
+  content: '';
+  position: absolute;
+  left: 4px; top: 4px; bottom: 4px;
+  width: 3px;
+  background: var(--green);
+  opacity: 0.7;
+  z-index: 1;
+}
+
+/* status variant — target the wavy pseudo-element */
+.task-card.overdue::after  { background: rgba(235,190,175,0.38); border-color: rgba(160,60,40,0.55); filter: url(#wavy-card) drop-shadow(0 0 3px rgba(140,40,20,0.65)); }
+.task-card.overdue::before { background: var(--red); }
+.task-card.soon::after     { background: rgba(235,225,165,0.38); border-color: rgba(130,100,20,0.55); filter: url(#wavy-card) drop-shadow(0 0 3px rgba(140,110,10,0.65)); }
+.task-card.soon::before    { background: var(--gold); }
+.task-card.done            { opacity: 0.6; }
+.task-card.done::after     { background: rgba(200,210,185,0.25); border-color: rgba(80,100,60,0.3); }
+.task-card.done::before    { background: var(--text-muted); opacity: 0.3; }
+
+/* animations */
+.task-card.enter {
+  animation: growIn 0.35s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.task-card.overdue:not(.settling):not(.falling):not(.enter)::after {
+  animation: wiltBg 3.5s 0.6s ease-in-out infinite;
+}
+
+.task-card.soon:not(.settling):not(.falling):not(.enter)::after {
+  animation: glowBg 2.5s 0.5s ease-in-out infinite;
+}
+
+.task-card.settling {
+  animation: leafSettle 0.5s cubic-bezier(0.22, 1, 0.36, 1) both !important;
+}
+
+.task-card.falling {
+  animation: fallAway 0.42s cubic-bezier(0.55, 0, 1, 0.45) both !important;
+}
+
+@keyframes growIn {
+  from { opacity: 0; transform: scaleY(0.5) translateY(-12px); }
+  to   { opacity: 1; transform: scaleY(1)   translateY(0); }
+}
+
+@keyframes leafSettle {
+  0%   { transform: rotate(0deg)    translateX(0); }
+  20%  { transform: rotate(-1.8deg) translateX(-3px); }
+  50%  { transform: rotate( 1.1deg) translateX( 2px); }
+  75%  { transform: rotate(-0.5deg) translateX(-1px); }
+  100% { transform: rotate(0deg)    translateX(0); }
+}
+
+@keyframes fallAway {
+  0%   { opacity: 1;   transform: translateY(0)   rotate(0deg) scaleY(1);   }
+  35%  { opacity: 0.6; transform: translateY(6px)  rotate(2deg) scaleY(0.9); }
+  100% { opacity: 0;   transform: translateY(40px) rotate(6deg) scaleY(0.3); }
+}
+
+@keyframes wiltBg {
+  0%, 100% { transform: translateX(0); filter: url(#wavy-card) drop-shadow(0 0 3px rgba(140,40,20,0.65)); }
+  20%       { transform: translateX(-2px) rotate(-0.4deg); }
+  40%       { transform: translateX( 2px) rotate( 0.4deg); }
+  60%       { transform: translateX(-1px); }
+  80%       { transform: translateX( 1px); }
+}
+
+@keyframes glowBg {
+  0%, 100% { filter: url(#wavy-card) drop-shadow(0 0 3px rgba(140,110,10,0.5)); }
+  50%       { filter: url(#wavy-card) drop-shadow(0 0 8px rgba(200,168,60,0.7)); }
+}
+
+/* ── check button ── */
+
+.check-btn {
+  width: 20px;
+  height: 20px;
+  min-width: 20px;
+  border-radius: 0;
+  border: 2px solid var(--green);
+  background: transparent;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-top: 2px;
+  transition: background 0.15s;
+  flex-shrink: 0;
+  box-shadow: 1px 1px 0 rgba(100,130,80,0.3);
+}
+
+.check-btn:hover { background: rgba(90,140,60,0.2); }
+
+.task-card.done .check-btn {
+  background: var(--green);
+  border-color: var(--green);
+}
+
+.check-icon        { display: none; }
+.task-card.done .check-icon { display: block; }
+
+/* ── task body ── */
+
+.card-inner {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  align-items: flex-start;
+  gap: 0.8rem;
+  width: 100%;
+}
+
+.task-body { flex: 1; min-width: 0; }
+
+.task-title {
+  font-size: 0.93rem;
+  color: var(--text);
+  line-height: 1.45;
+  word-break: break-word;
+  transition: color 0.25s;
+}
+
+.task-card.done .task-title {
+  text-decoration: line-through;
+  color: rgba(138,154,120,0.6);
+}
+
+.task-meta {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  margin-top: 0.3rem;
+  flex-wrap: wrap;
+}
+
+.task-date {
+  font-family: 'Pixelify Sans', monospace;
+  font-size: 0.65rem;
+  letter-spacing: 0.04em;
+  color: var(--text-muted);
+}
+
+.badge {
+  font-family: 'Pixelify Sans', monospace;
+  font-size: 0.62rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  padding: 0.1rem 0.45rem;
+  border-radius: 0;
+  border: 1px solid;
+}
+
+.badge-upcoming { background: rgba(120,180,90,0.18);  border-color: rgba(100,160,70,0.35);  color: var(--dark-green); }
+.badge-soon     { background: rgba(220,190,80,0.2);  border-color: rgba(200,170,60,0.4);  color: #7A6010; }
+.badge-overdue  { background: rgba(210,110,90,0.18); border-color: rgba(200,90,70,0.35);  color: #A04030; }
+.badge-done     { background: rgba(150,160,130,0.15);border-color: rgba(130,140,110,0.3); color: var(--text-muted); }
+
+/* ── delete button ── */
+
+.delete-btn {
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  color: var(--text-muted);
+  opacity: 0.28;
+  padding: 2px 4px;
+  font-size: 0.82rem;
+  line-height: 1;
+  transition: opacity 0.15s, color 0.15s;
+  flex-shrink: 0;
+  margin-top: 2px;
+  font-family: 'Pixelify Sans', monospace;
+}
+
+.delete-btn:hover { opacity: 0.8; color: var(--red); }
+
+/* ── empty state ── */
+
+.empty-state {
+  text-align: center;
+  padding: 4rem 1rem;
+  color: var(--text-muted);
+  font-family: 'Pixelify Sans', monospace;
+  font-size: 0.75rem;
+  letter-spacing: 0.06em;
+  opacity: 0.6;
+}
+
+.empty-state span { display: block; font-size: 2rem; margin-bottom: 0.9rem; filter: drop-shadow(0 0 8px rgba(212,137,106,0.5)); }
