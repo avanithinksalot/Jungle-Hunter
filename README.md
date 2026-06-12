@@ -8,7 +8,6 @@ A pixel art forest-themed to-do app built with React + Vite.
 - Add tasks with a title, date and time deadline
 - Mark tasks as done, delete tasks
 - Status badges: upcoming, due soon, overdue
-- Browser notifications when deadlines are close
 - Pixel art forest background with animated wavy card edges
 
 ## Run locally

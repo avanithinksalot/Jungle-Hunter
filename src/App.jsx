@@ -76,62 +76,17 @@ function TaskCard({ task, onToggle, onDelete }) {
   )
 }
 
-const NOTIF_KEY = 'ghibli-notified'
-
-function getNotified() {
-  try { return JSON.parse(localStorage.getItem(NOTIF_KEY) || '{}') } catch { return {} }
-}
-
-function checkAndNotify(tasks) {
-  if (typeof Notification === 'undefined' || Notification.permission !== 'granted') return
-  const now = new Date()
-  const notified = getNotified()
-  const updated = { ...notified }
-
-  for (const t of tasks) {
-    if (t.done || !t.date) continue
-    const due = new Date(`${t.date}T${t.time || '23:59'}:00`)
-    const diffHours = (due - now) / 3600000
-
-    let label = null
-    let key = null
-    if (diffHours < 0) {
-      label = 'is overdue'; key = `${t.id}-overdue`
-    } else if (diffHours <= 24) {
-      label = `is due ${diffHours < 1 ? 'in less than an hour' : 'within 24 hours'}`; key = `${t.id}-24h`
-    } else if (diffHours <= 48) {
-      label = 'is due within 2 days'; key = `${t.id}-48h`
-    }
-
-    if (label && key && !notified[key]) {
-      new Notification('Jungle Hunter 🌿', { body: `"${t.title}" ${label}.` })
-      updated[key] = true
-    }
-  }
-
-  localStorage.setItem(NOTIF_KEY, JSON.stringify(updated))
-}
-
 export default function App() {
   const [tasks, setTasks] = useState(() => {
     try { return JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]') } catch { return [] }
   })
   const [title, setTitle] = useState('')
-  const [date, setDate] = useState('')
-  const [time, setTime] = useState('')
-  const [notifPerm, setNotifPerm] = useState(() =>
-    typeof Notification !== 'undefined' ? Notification.permission : 'default'
-  )
+  const [date, setDate]   = useState('')
+  const [time, setTime]   = useState('')
   const titleRef = useRef(null)
 
   useEffect(() => {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(tasks))
-  }, [tasks])
-
-  useEffect(() => {
-    checkAndNotify(tasks)
-    const interval = setInterval(() => checkAndNotify(tasks), 60 * 60 * 1000)
-    return () => clearInterval(interval)
   }, [tasks])
 
   const addTask = useCallback(() => {
@@ -151,13 +106,6 @@ export default function App() {
   const deleteTask = useCallback((id) => {
     setTasks(prev => prev.filter(t => t.id !== id))
   }, [])
-
-  async function requestNotifications() {
-    if (typeof Notification === 'undefined') return
-    const perm = await Notification.requestPermission()
-    setNotifPerm(perm)
-    if (perm === 'granted') checkAndNotify(tasks)
-  }
 
   const active = tasks.filter(t => !t.done)
   const done   = tasks.filter(t => t.done)
@@ -213,14 +161,6 @@ export default function App() {
           </div>
           <button className="btn-add" onClick={addTask}>Add</button>
         </div>
-        <button
-          className={`notif-btn${notifPerm === 'granted' ? ' granted' : ''}`}
-          onClick={requestNotifications}
-        >
-          {notifPerm === 'granted'
-            ? '✦ reminders are awake'
-            : '✦ allow gentle reminders when a deadline is near'}
-        </button>
       </div>
 
       {tasks.length === 0 && (
