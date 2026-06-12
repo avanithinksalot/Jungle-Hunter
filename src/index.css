@@ -12,8 +12,8 @@
   --glow:         #E8A88C;
   --pink:         #E8C0C8;
   --gold:         #E0C870;
-  --text:         #2E3A22;
-  --text-muted:   #7A8A68;
+  --text:         #F5EED8;
+  --text-muted:   #C8D8A8;
   --red:          #D07060;
   --border:       rgba(100,150,70,0.25);
 }
@@ -61,16 +61,16 @@ body {
 .header h1 {
   font-family: 'Pixelify Sans', monospace;
   font-size: 2rem;
-  color: var(--text);
+  color: #F472B6;
   letter-spacing: 0.04em;
   margin-bottom: 0.3rem;
-  text-shadow: 0 0 20px rgba(212,137,106,0.4), 2px 2px 0 rgba(0,0,0,0.5);
+  text-shadow: 0 0 16px rgba(244,114,182,0.6), 2px 2px 0 rgba(0,0,0,0.4);
 }
 
 .header p {
   font-family: 'Pixelify Sans', monospace;
   font-size: 0.72rem;
-  color: var(--text-muted);
+  color: #F9F3E8;
   letter-spacing: 0.08em;
 }
 
