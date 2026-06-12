@@ -76,16 +76,40 @@ function TaskCard({ task, onToggle, onDelete }) {
   )
 }
 
-function scheduleNotification(task) {
-  if (!task.date || Notification.permission !== 'granted') return
-  const due = new Date(`${task.date}T${task.time || '23:59'}:00`)
-  const remind = new Date(due.getTime() - 2 * 86400000)
-  const delay = remind - Date.now()
-  if (delay > 0 && delay < 7 * 86400000) {
-    setTimeout(() => {
-      new Notification('Forest reminder 🌿', { body: `"${task.title}" is due in 2 days.` })
-    }, delay)
+const NOTIF_KEY = 'ghibli-notified'
+
+function getNotified() {
+  try { return JSON.parse(localStorage.getItem(NOTIF_KEY) || '{}') } catch { return {} }
+}
+
+function checkAndNotify(tasks) {
+  if (typeof Notification === 'undefined' || Notification.permission !== 'granted') return
+  const now = new Date()
+  const notified = getNotified()
+  const updated = { ...notified }
+
+  for (const t of tasks) {
+    if (t.done || !t.date) continue
+    const due = new Date(`${t.date}T${t.time || '23:59'}:00`)
+    const diffHours = (due - now) / 3600000
+
+    let label = null
+    let key = null
+    if (diffHours < 0) {
+      label = 'is overdue'; key = `${t.id}-overdue`
+    } else if (diffHours <= 24) {
+      label = `is due ${diffHours < 1 ? 'in less than an hour' : 'within 24 hours'}`; key = `${t.id}-24h`
+    } else if (diffHours <= 48) {
+      label = 'is due within 2 days'; key = `${t.id}-48h`
+    }
+
+    if (label && key && !notified[key]) {
+      new Notification('Jungle Hunter 🌿', { body: `"${t.title}" ${label}.` })
+      updated[key] = true
+    }
   }
+
+  localStorage.setItem(NOTIF_KEY, JSON.stringify(updated))
 }
 
 export default function App() {
@@ -105,19 +129,10 @@ export default function App() {
   }, [tasks])
 
   useEffect(() => {
-    if (notifPerm !== 'granted') return
-    const now = new Date()
-    for (const t of tasks) {
-      if (t.done || !t.date) continue
-      const due = new Date(`${t.date}T${t.time || '23:59'}:00`)
-      const diffDays = (due - now) / 86400000
-      if (diffDays >= 0 && diffDays <= 1) {
-        new Notification('Forest reminder 🌿', {
-          body: `"${t.title}" is due ${diffDays < 0.5 ? 'very soon' : 'tomorrow'}.`,
-        })
-      }
-    }
-  }, [])
+    checkAndNotify(tasks)
+    const interval = setInterval(() => checkAndNotify(tasks), 60 * 60 * 1000)
+    return () => clearInterval(interval)
+  }, [tasks])
 
   const addTask = useCallback(() => {
     const trimmed = title.trim()
@@ -127,7 +142,6 @@ export default function App() {
     setTitle('')
     setDate('')
     setTime('')
-    scheduleNotification(task)
   }, [title, date, time])
 
   const toggleDone = useCallback((id) => {
@@ -142,6 +156,7 @@ export default function App() {
     if (typeof Notification === 'undefined') return
     const perm = await Notification.requestPermission()
     setNotifPerm(perm)
+    if (perm === 'granted') checkAndNotify(tasks)
   }
 
   const active = tasks.filter(t => !t.done)
